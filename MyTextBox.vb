@@ -1,4 +1,4 @@
-﻿Imports System.ComponentModel
+Imports System.ComponentModel
 
 Public Class myTextBox
     Inherits TextBox
@@ -216,8 +216,19 @@ Public Class myTextBox
             Dim keyAsc As Short = Asc(e.KeyChar)
             Select Case keyAsc
                 Case 48 To 57, 8, Asc(decSep)
-                    If keyAsc = Asc(decSep) And DecimalPlaces > 0 Then e.Handled = True : Exit Sub
-                    If keyAsc = Asc(decSep) AndAlso Text.Contains(decSep) Then e.Handled = True
+                    If keyAsc = Asc(decSep) And DecimalPlaces > 0 Then
+                        'Muevo el cursor cerca de los decimales cuando digito el punto ».«
+                        SelectionStart = Text.IndexOf(decSep) + 1
+                        e.Handled = True
+                        Exit Sub
+                    End If
+                    If keyAsc = Asc(decSep) AndAlso Text.Contains(decSep) Then
+                        e.Handled = True
+                    Else
+                        If SelectionStart >= Text.IndexOf(decSep) + 1 Then
+                            SelectionLength = 1
+                        End If
+                    End If
                 Case Else
                     e.Handled = True
             End Select
@@ -249,20 +260,20 @@ Public Class myTextBox
             Dim Position As Integer = SelectionStart
             Dim CantidadCaracteres = Len(FormatNumber(Replace(Text, ",", ""), decPlc))
 
-            If Len(Text) - CantidadCaracteres = -1 Then
-                Text = FormatNumber(Replace(Text, ",", ""), decPlc)
-                SelectionStart = Position + 1
-            ElseIf Len(Text) - CantidadCaracteres = 1 Then
-                Text = FormatNumber(Replace(Text, ",", ""), decPlc)
-                SelectionStart = Position - 1
-            Else
-                Text = FormatNumber(Replace(Text, ",", ""), decPlc)
-                SelectionStart = Position
-            End If
+                If Len(Text) - CantidadCaracteres = -1 Then
+                    Text = FormatNumber(Replace(Text, ",", ""), decPlc)
+                    SelectionStart = Position + 1
+                ElseIf Len(Text) - CantidadCaracteres = 1 Then
+                    Text = FormatNumber(Replace(Text, ",", ""), decPlc)
+                    SelectionStart = Position - 1
+                Else
+                    Text = FormatNumber(Replace(Text, ",", ""), decPlc)
+                    SelectionStart = Position
+                End If
             preText = Text
-            End If
+        End If
 
-            MyBase.OnTextChanged(e)
+        MyBase.OnTextChanged(e)
     End Sub
 
 #End Region
@@ -271,4 +282,3 @@ Public Class myTextBox
         JoinEvents(True)
     End Sub
 End Class
-
